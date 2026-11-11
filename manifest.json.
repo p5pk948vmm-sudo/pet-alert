@@ -1,0 +1,9 @@
+{
+  "name": "PetAlert | Pet Care & Safety",
+  "short_name": "PetAlert",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#fffaf4",
+  "theme_color": "#66734b",
+  "description": "Aplicación para el cuidado y la seguridad de las mascotas."
+}
