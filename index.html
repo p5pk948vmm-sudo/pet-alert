@@ -1,0 +1,451 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#66734b">
+<link rel="manifest" href="manifest.json">
+<title>PetAlert | Pet Care & Safety</title>
+
+<style>
+:root {
+  --olive:#66734b;
+  --dark:#4f5b39;
+  --sky:#bfe9f5;
+  --blue:#1976ff;
+  --pink:#f7c9d9;
+  --yellow:#ffe9a8;
+  --cream:#fffaf4;
+}
+
+* { box-sizing:border-box; }
+
+body {
+  margin:0;
+  font-family:Arial,sans-serif;
+  background:var(--cream);
+  color:#25291f;
+}
+
+header {
+  background:var(--olive);
+  color:white;
+  padding:25px 20px;
+  border-radius:0 0 25px 25px;
+}
+
+.logo {
+  font-size:27px;
+  font-weight:bold;
+}
+
+main { padding:18px; }
+
+.page { display:none; }
+.page.active { display:block; }
+
+.card {
+  background:white;
+  border-radius:18px;
+  padding:17px;
+  margin-bottom:14px;
+  box-shadow:0 3px 12px #0000000c;
+}
+
+h1 { font-size:25px; }
+h2 { font-size:18px; }
+
+button {
+  border:0;
+  border-radius:12px;
+  padding:12px;
+  background:var(--olive);
+  color:white;
+  font-weight:bold;
+  cursor:pointer;
+}
+
+input,select {
+  width:100%;
+  padding:12px;
+  margin:7px 0 13px;
+  border:1px solid #ddd;
+  border-radius:10px;
+}
+
+.metric {
+  background:var(--sky);
+  border-radius:15px;
+  padding:15px;
+}
+
+.metric:nth-child(2) {
+  background:var(--yellow);
+}
+
+.grid {
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:12px;
+}
+
+.bottom {
+  position:fixed;
+  bottom:0;
+  left:0;
+  right:0;
+  background:white;
+  display:flex;
+  justify-content:space-around;
+  padding:10px 2px;
+  border-top:1px solid #ddd;
+}
+
+.bottom button {
+  background:transparent;
+  color:var(--dark);
+  padding:7px 3px;
+  font-size:11px;
+}
+
+.bottom button.active {
+  color:var(--blue);
+}
+
+.pet-photo {
+  width:75px;
+  height:75px;
+  object-fit:cover;
+  border-radius:15px;
+}
+
+main { padding-bottom:100px; }
+.small { color:#777; font-size:13px; }
+</style>
+</head>
+
+<body>
+
+<header>
+  <div class="logo">PET🐾ALERT</div>
+  <div>Pet Care & Safety</div>
+</header>
+
+<main>
+
+<section id="home" class="page active">
+  <h1>Bienvenido a PetAlert</h1>
+  <p>Cuidar también es prevenir.</p>
+
+  <div class="card" id="homePet">
+    Agrega tu primera mascota.
+  </div>
+
+  <div class="grid">
+    <div class="metric">
+      Temperatura
+      <h2 id="homeTemp">-- °C</h2>
+    </div>
+    <div class="metric">
+      Humedad
+      <h2 id="homeHum">-- %</h2>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Estado ambiental</h2>
+    <p id="homeStatus">Sin registros.</p>
+    <button onclick="showPage('monitor')">
+      Registrar lectura
+    </button>
+  </div>
+</section>
+
+<section id="pets" class="page">
+  <h1>Mis mascotas</h1>
+
+  <div class="card">
+    <form id="petForm">
+      <label>Nombre</label>
+      <input id="petName" required>
+
+      <label>Animal</label>
+      <select id="petSpecies">
+        <option>Perro</option>
+        <option>Gato</option>
+        <option>Conejo</option>
+        <option>Ave</option>
+        <option>Tortuga</option>
+        <option>Pez</option>
+        <option>Otro</option>
+      </select>
+
+      <label>Edad</label>
+      <input id="petAge">
+
+      <label>Raza</label>
+      <input id="petBreed">
+
+      <label>Fotografía</label>
+      <input id="petPhoto" type="file" accept="image/*">
+
+      <button type="submit">Guardar mascota</button>
+    </form>
+  </div>
+
+  <div id="petList"></div>
+</section>
+
+<section id="monitor" class="page">
+  <h1>Monitor ambiental</h1>
+
+  <div class="card">
+    <form id="readingForm">
+      <label>Temperatura °C</label>
+      <input id="temperature" type="number" step="0.1" required>
+
+      <label>Humedad %</label>
+      <input id="humidity" type="number" min="0" max="100" required>
+
+      <button type="submit">Guardar lectura</button>
+    </form>
+    <p class="small">
+      Las lecturas son manuales hasta conectar el sensor del collar.
+    </p>
+  </div>
+
+  <div class="card">
+    <h2>Última lectura</h2>
+    <p id="monitorTemp">-- °C</p>
+    <p id="monitorHum">-- %</p>
+    <p id="monitorStatus">Sin registros.</p>
+  </div>
+</section>
+
+<section id="history" class="page">
+  <h1>Historial</h1>
+  <div class="card" id="historyList">
+    Sin registros.
+  </div>
+</section>
+
+<section id="alerts" class="page">
+  <h1>Alertas</h1>
+  <div class="card" id="alertSummary">
+    Registra una lectura para consultar el estado ambiental.
+  </div>
+</section>
+
+<section id="care" class="page">
+  <h1>Cuidados</h1>
+  <div class="card">
+    <form id="careForm">
+      <label>Recordatorio</label>
+      <input id="careTitle" required>
+
+      <label>Fecha</label>
+      <input id="careDate" type="date" required>
+
+      <button type="submit">Guardar recordatorio</button>
+    </form>
+  </div>
+  <div class="card" id="careList">Sin recordatorios.</div>
+</section>
+
+<section id="nearby" class="page">
+  <h1>Refugios cercanos</h1>
+
+  <div class="card">
+    <p>Encuentra refugios y centros de adopción cercanos.</p>
+    <button onclick="findShelters()">
+      Buscar refugios cercanos
+    </button>
+  </div>
+
+  <div class="card">
+    <label>Buscar por ciudad</label>
+    <input id="city" placeholder="Escribe tu ciudad">
+    <button onclick="searchCity()">Buscar</button>
+  </div>
+</section>
+
+<section id="settings" class="page">
+  <h1>Configuración</h1>
+  <div class="card">
+    <h2>PetAlert</h2>
+    <p>Pet Care & Safety</p>
+    <p>Versión inicial</p>
+  </div>
+  <div class="card">
+    <button onclick="clearData()">Borrar mis datos</button>
+  </div>
+</section>
+
+</main>
+
+<nav class="bottom">
+  <button class="active" onclick="showPage('home',this)">⌂<br>Inicio</button>
+  <button onclick="showPage('pets',this)">♡<br>Mascotas</button>
+  <button onclick="showPage('monitor',this)">◉<br>Monitor</button>
+  <button onclick="showPage('history',this)">▤<br>Historial</button>
+  <button onclick="showPage('nearby',this)">⌖<br>Refugios</button>
+  <button onclick="showPage('settings',this)">⚙<br>Más</button>
+</nav>
+
+<script>
+const get = key => JSON.parse(localStorage.getItem(key)||'[]');
+const put = (key,data) => localStorage.setItem(key,JSON.stringify(data));
+
+let pets = get('pets');
+let readings = get('readings');
+let reminders = get('reminders');
+
+function showPage(id,button) {
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+
+  document.querySelectorAll('.bottom button').forEach(b=>b.classList.remove('active'));
+  if(button) button.classList.add('active');
+
+  render();
+}
+
+function status(t,h) {
+  if(t>=35 || (t>=32 && h>=70))
+    return 'Riesgo elevado. Busca un lugar fresco y consulta a un veterinario.';
+  if(t>=30 || (t>=27 && h>=70))
+    return 'Precaución. Vigila a tu mascota y evita actividad intensa.';
+  return 'Sin alerta por estos valores. Sigue observando a tu mascota.';
+}
+
+function render() {
+  const last=readings[0];
+  const pet=pets[0];
+
+  document.getElementById('homePet').textContent =
+    pet ? pet.name+' · '+pet.species : 'Agrega tu primera mascota.';
+
+  document.getElementById('homeTemp').textContent=last?last.t+' °C':'-- °C';
+  document.getElementById('homeHum').textContent=last?last.h+' %':'-- %';
+
+  document.getElementById('monitorTemp').textContent=last?last.t+' °C':'-- °C';
+  document.getElementById('monitorHum').textContent=last?last.h+' %':'-- %';
+
+  document.getElementById('homeStatus').textContent=last?status(last.t,last.h):'Sin registros.';
+  document.getElementById('monitorStatus').textContent=last?status(last.t,last.h):'Sin registros.';
+  document.getElementById('alertSummary').textContent=last?status(last.t,last.h):'Sin registros.';
+
+  document.getElementById('petList').innerHTML=pets.map((p,i)=>`
+    <div class="card">
+      <h2>${safe(p.name)}</h2>
+      ${safe(p.species)} · ${safe(p.age)}
+      <br><button onclick="deletePet(${i})">Eliminar</button>
+    </div>`).join('');
+
+  document.getElementById('historyList').innerHTML=readings.map(r=>`
+    <p>${r.t} °C · ${r.h}% humedad</p>
+    <small>${new Date(r.date).toLocaleString()}</small>
+    <hr>`).join('') || 'Sin registros.';
+
+  document.getElementById('careList').innerHTML=reminders.map(r=>`
+    <p>${safe(r.title)} · ${safe(r.date)}</p>`).join('') || 'Sin recordatorios.';
+}
+
+function safe(value) {
+  return String(value||'').replace(/[&<>"']/g,c=>({
+    '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+  }[c]));
+}
+
+document.getElementById('petForm').addEventListener('submit',async e=>{
+  e.preventDefault();
+
+  const file=document.getElementById('petPhoto').files[0];
+  let photo='';
+
+  if(file) {
+    photo=await new Promise(resolve=>{
+      const reader=new FileReader();
+      reader.onload=()=>resolve(reader.result);
+      reader.readAsDataURL(file);
+    });
+  }
+
+  pets.push({
+    name:document.getElementById('petName').value,
+    species:document.getElementById('petSpecies').value,
+    age:document.getElementById('petAge').value,
+    breed:document.getElementById('petBreed').value,
+    photo
+  });
+
+  put('pets',pets);
+  e.target.reset();
+  render();
+});
+
+document.getElementById('readingForm').addEventListener('submit',e=>{
+  e.preventDefault();
+
+  const t=Number(document.getElementById('temperature').value);
+  const h=Number(document.getElementById('humidity').value);
+
+  if(h<0 || h>100) return alert('Humedad inválida.');
+
+  readings.unshift({t,h,date:new Date().toISOString()});
+  put('readings',readings);
+  e.target.reset();
+  render();
+});
+
+document.getElementById('careForm').addEventListener('submit',e=>{
+  e.preventDefault();
+
+  reminders.push({
+    title:document.getElementById('careTitle').value,
+    date:document.getElementById('careDate').value
+  });
+
+  put('reminders',reminders);
+  e.target.reset();
+  render();
+});
+
+function deletePet(i) {
+  pets.splice(i,1);
+  put('pets',pets);
+  render();
+}
+
+function findShelters() {
+  window.open('https://www.google.com/maps/search/animal+shelters+near+me','_blank');
+}
+
+function searchCity() {
+  const city=document.getElementById('city').value;
+  if(city) window.open(
+    'https://www.google.com/maps/search/animal+shelters+in/'+encodeURIComponent(city),
+    '_blank'
+  );
+}
+
+function clearData() {
+  if(confirm('¿Borrar todos los datos?')) {
+    localStorage.clear();
+    pets=[];
+    readings=[];
+    reminders=[];
+    render();
+  }
+}
+
+if('serviceWorker' in navigator && location.protocol!=='file:') {
+  navigator.serviceWorker.register('./service-worker.js');
+}
+
+render();
+</script>
+
+</body>
+</html>
